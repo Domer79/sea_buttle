@@ -1,0 +1,7 @@
+{
+    "jshint.enable" : false,
+    "terminal.integrated.env.windows": {
+       "NODE_ENV": "development",
+       "USER": "Domer"
+   }
+}

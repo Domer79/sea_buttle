@@ -1,0 +1,46 @@
+$imageFolderPath: '/images';
+
+%base-cell{
+  width:20px;
+  height:20px;
+}
+
+table {
+  thead{
+    tr{
+      th{
+        @extend %base-cell
+      }
+    }
+  }
+  tbody{
+    tr{
+      td{
+        @extend %base-cell;
+        cursor: pointer;
+      }
+      .none{
+        background-color: antiquewhite;
+      }
+      .occupy{
+        background-image: url($imageFolderPath+'/occupy.png');
+      }
+      .past{
+        background-image: url($imageFolderPath+'/past.png');
+        cursor: default
+      }
+      .live{
+        background-image: url($imageFolderPath+'/live.png')
+      }
+      .got{
+        background-image: url($imageFolderPath+'/got.png');
+      }
+      .dead{
+        background-image: url($imageFolderPath+'/dead.png');
+      }
+      .mask{
+        background-image: url($imageFolderPath+'/mask.png');
+      }
+    }
+  }
+}
