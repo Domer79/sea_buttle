@@ -3,6 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Robot_1 = require("./Robot");
 const contracts_1 = require("./contracts");
 const $ = require("jquery");
+/**
+ * Представляет собой судью
+ */
 class Referee {
     constructor(userButtle, enemyButtle) {
         this.userButtle = userButtle;
@@ -10,12 +13,18 @@ class Referee {
         this.initUserShut();
         this._robot = new Robot_1.default(userButtle.getDefaultShut());
     }
+    /**
+     * Запуск игры
+     */
     play() {
         this.userButtle.lock();
         this.enemyButtle.closeCurtain(true);
         this.userButtle.closeCurtain();
         this.activePlayer = ActivePlayer.User;
     }
+    /**
+     * Иницилизация обработчика стрельбы по полю робота
+     */
     initUserShut() {
         let self = this;
         let userShut = function (event) {
@@ -26,9 +35,9 @@ class Referee {
         };
         this.enemyButtle.shut = userShut;
     }
-    initEnemyShut() {
-        let self = this;
-    }
+    // initEnemyShut(){
+    //     let self = this;
+    // }
     get cellStatus() {
         return this._cellStatus;
     }

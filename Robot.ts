@@ -1,6 +1,9 @@
 import ButtleField from './table';
 import {IState, CellStatus, AttackInfo, Direction} from './contracts';
 
+/**
+ * Представляет собой робота, против которого ведется игра. Реализован механизм машины состояний
+ */
 export default class Robot{
     private _currentState: IState;
     private _attackCells: Array<AttackInfo>;
@@ -84,6 +87,9 @@ export default class Robot{
     }
 }
 
+/**
+ * Базовый класс состояния для стрельбы
+ */
 abstract class State implements IState{
     constructor(protected buttleShut: (row: number, col: number) => CellStatus, protected _attackCells: Array<AttackInfo>){
 
@@ -101,6 +107,9 @@ abstract class State implements IState{
     
 }
 
+/**
+ * Рандомное состояние - стрельбы ведется по случайным ячейкам
+ */
 class RandomState extends State{
     private _currentAttackInfo: AttackInfo;
 
@@ -125,6 +134,9 @@ class RandomState extends State{
     }
 }
 
+/**
+ * Состояние попадания - включается когда по кораблю было нанесено ранение
+ */
 class GotState extends State{
     private _firstAttackInfo: AttackInfo;
     private _attackInfo: AttackInfo;

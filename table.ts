@@ -25,6 +25,9 @@ export default class ButtleField{
     fieldCells: FieldCell[] = new Array<FieldCell>();
     jqueryFieldContainer: any;
 
+    /**
+     * Добавляет строку заговка в таблицу
+     */
     addHeadRow(): any {
         let row = $(`<tr class="headRow"></tr>`);
 
@@ -39,6 +42,9 @@ export default class ButtleField{
         return $("<thead></thead>").append(row);
     }
 
+    /**
+     * Рисует поле
+     */
     render() {
         this.jqueryFieldContainer = $("<div class='container'></div>");
         this.jqueryFieldContainer.append($("<div class='lock'></div>"));
@@ -76,11 +82,9 @@ export default class ButtleField{
         $("body").append(this.jqueryFieldContainer);
     }
 
-    // shut(event: any): any {
-    //     let coords = $(this).attr("coords").split(',');
-    //     $(this).addClass("got");
-    // }
-
+    /**
+     * Предоставляет метод стрельбы
+     */
     getDefaultShut(): (row: Number, col: Number) => CellStatus{
         var self = this;
         return function defaultShut(row: number, col: number): CellStatus{
@@ -108,12 +112,18 @@ export default class ButtleField{
         }
     }
 
+    /**
+     * Событие, возникающее при стрельбе по ячейке
+     */
     shut: (event: any) => void;
 
     addClasses(): string {
         return "field";
     }
 
+    /**
+     * Инициализация кораблей на поле
+     */
     initShips(){
         for (var i = 0; i < this.ships.length; i++) {
             let ships = this.ships.filter(function(element){
@@ -128,6 +138,10 @@ export default class ButtleField{
         }
     }
 
+    /**
+     * Инциализация одного корабля
+     * @param ship 
+     */
     private initShip(ship: Ship){
         var freeCells = this.getFreeCells();
         let fieldCell: FieldCell = this.getFirstRandomCell(freeCells);
@@ -166,12 +180,19 @@ export default class ButtleField{
         });
     }
 
+    /**
+     * Возвращает первую случайную ячейку из переданного массива
+     * @param cells 
+     */
     private getFirstRandomCell(cells: Array<FieldCell>):FieldCell{
         let rand = Math.random();
         let index = Math.round(rand * (cells.length * 0.5));
         return cells[index === cells.length ? index - 1 : index];
     }
 
+    /**
+     * Возвращает массив свободных ячеек поля
+     */
     private getFreeCells(): Array<FieldCell>{
         return this.fieldCells.filter(function(fieldCell: FieldCell){
 
@@ -179,6 +200,10 @@ export default class ButtleField{
         });
     }
 
+    /**
+     * Вешает шторку на поле 
+     * @param withShips Если установлено true, занавешивает все ячейки, включая корабли
+     */
     closeCurtain(withShips?: boolean): void {
         this.fieldCells.forEach(element => {
             if (withShips){
@@ -191,31 +216,49 @@ export default class ButtleField{
         });
     }
 
+    /**
+     * Блокирует поле
+     */
     lock(): any {
         let lock = $(".lock", this.jqueryFieldContainer);
         lock.css("display", "inline")
     }
 
+    /**
+     * Разблокирует поле
+     */
     unLock(): any {
         let lock = $(".lock", this.jqueryFieldContainer);
         lock.css("display", "none")
     }
 
+    /**
+     * Сообщает о том, что все корабли на поле повержены
+     */
     down(): boolean{
         return this.ships.filter(function(element: Ship){
             return element.isDead();
         }).length == this.ships.length;
     }
 
+    /**
+     * Вешает туман на поле, используется в сочетании с lock()
+     */
     fog(){
         $(this.jqueryFieldContainer).css("opacity", "0.5");
     }
 
+    /**
+     * Убирает туман
+     */
     clearFog(){
         $(this.jqueryFieldContainer).css("opacity", "");    
     }
 }
 
+/**
+ * Инкапсулирует свойства и методы ячейки поля
+ */
 export class FieldCell{
     ship: Ship;
     private _row: number;
@@ -229,6 +272,9 @@ export class FieldCell{
         this.cellStatus = CellStatus.None;
     }
 
+    /**
+     * Задает и возвращает номер строки ячейки
+     */ 
     public get row(): number{
         return this._row;
     }
@@ -237,6 +283,9 @@ export class FieldCell{
         return this._col;
     }
 
+    /**
+     * Задает и возвращает состояние ячейки
+     */
     public get cellStatus(){
         return this._cellStatus;
     }
@@ -248,6 +297,9 @@ export class FieldCell{
         .addClass(CellStatus[value].toLowerCase());
     }
 
+    /**
+     * Возвращает следующую за текущей по порядку ячейку
+     */
     getNextCell(): FieldCell{
         var self = this;
         var nextCell = this.allCells.find(function(element: FieldCell){
@@ -263,6 +315,10 @@ export class FieldCell{
         return nextCell;
     }
 
+    /**
+     * Устанавливает все ячейки вокруг текущей, кроме соседних ячеек корабля занятыми и принадлежность этой ячейки кораблю
+     * @param ship 
+     */
     occupy(ship: Ship): any {
         this.ship = ship;
 
@@ -280,18 +336,30 @@ export class FieldCell{
         });
     }
 
+    /**
+     * Определяет, является ли ячейка подбитой
+     */
     isDead(): boolean{
         return this.cellStatus === CellStatus.Dead;
     }
 
+    /**
+     * Устанавливает маску на ячейку, используется при навешивании шторы на поле
+     */
     addMask() {
         this.td.addClass("mask");
     }
 
+    /**
+     * Удаляет маску
+     */
     removeMask() {
         this.td.removeClass("mask");
     }
 
+    /**
+     * Удаляет маску с занятых ячеек вокруг текущей, используется при оповещении уничтожения корабля
+     */
     occupyRemoveMask(){
         this.workAround((fieldCells: Array<FieldCell>) => {
             fieldCells.forEach(element => {
@@ -303,12 +371,18 @@ export class FieldCell{
         });
     }
 
+    /**
+     * Отображает маску огня при стрельбе по ячейке
+     */
     fire(){
         $(".fire", this.td).show("fast", function(){
             $(this).hide();
         });
     }
 
+    /**
+     * Деактивирует ячейку
+     */
     disable(){
         this.td.unbind("shut");
         this.td.css("cursor", "default");
@@ -344,6 +418,9 @@ export class FieldCell{
     }
 }
 
+/**
+ * Инкапсулирует свойства и методы корабля
+ */
 class Ship{
     constructor(public length:number){
         this.coords = new Array<FieldCell>();
@@ -352,14 +429,23 @@ class Ship{
         }
     }
 
+    /**
+     * Координаты ячеек корабля
+     */
     coords:Array<FieldCell>;
 
+    /**
+     * Очищает состояние корабля до CellStatus.None
+     */
     clear(){
         this.coords.forEach(element => {
             element.cellStatus = CellStatus.None;
         });
     }
 
+    /**
+     * Устанавливает временное состояние для ячейки, при неуспешной инициализации корабля по заданным координатам
+     */
     SetTemp(){
         this.coords.forEach(element => {
             if (element)
@@ -367,6 +453,9 @@ class Ship{
         });
     }
 
+    /**
+     * Проверяет готовность корабля при его инициализации
+     */
     get ready(): boolean{
         return this.isReady();
     }
@@ -379,18 +468,27 @@ class Ship{
         return result;
     }
 
+    /**
+     * Занимает все ячейки вокруг корабля занятыми
+     */
     occupy() {
         this.coords.forEach(element => {
             element.occupy(this);
         });
     }
 
+    /**
+     * Определяет, поражение корабля
+     */
     isDead(): boolean{
         return this.coords.filter(element => {
             return element.isDead();
         }).length === this.coords.length;
     }
 
+    /**
+     * Удаляет маску со всех занятых ячеек корабля при его поражении
+     */
     occupyRemoveMask(): any {
         this.coords.forEach(element => {
             element.occupyRemoveMask();

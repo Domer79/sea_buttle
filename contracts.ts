@@ -1,36 +1,9 @@
 import * as $ from 'jquery';
 import {FieldCell} from './table';
 
-export default abstract class Dom{
-    private childs: Dom[] = new Array<Dom>();
-    constructor(domElement:string|object){
-        if (!domElement)
-            throw new ArgumentNullException("domElement");
-
-        if (typeof domElement === "string")
-            this.jqueryElement = $(domElement);
-        else
-            this.jqueryElement = domElement;
-    }
-
-    protected render(): void{
-        
-    }
-
-    jqueryElement: any;
-    abstract addClasses():string;
-
-    append(dom: Dom): Dom{
-        this.childs.push(dom);
-        return this;
-    }
-
-    text(text: string): Dom{
-        this.jqueryElement.text(text);
-        return this;
-    }
-}
-
+/**
+ * Возможные состояния ячеек
+ */
 export enum CellStatus{
     None = 0, //Автоматически устанавливается при инициализация
     Temp = 1, //Временный статус, используется при инициализации корабля
@@ -41,11 +14,24 @@ export enum CellStatus{
     Dead = 32, //Устанавливается при полном уничтожении корабля
 }
 
+/**
+ * Интерфейс, описывающий способ стрельбы для робота
+ */
 export interface IState{
+    /**
+     * Стрельба по ячейке
+     */
     Shut(): AttackInfo;
+
+    /**
+     * Возвращает информацию о состоянии текущей ячейки, для атаки
+     */
     getCurrentAttackInfo(): AttackInfo;
 }
 
+/**
+ * ИНформация о об атаке на ячейку
+ */
 export class AttackInfo{
     direction: Direction;
     cellStatus: CellStatus;
@@ -57,6 +43,9 @@ export class AttackInfo{
     }
 }
 
+/**
+ * Направление удара - используется роботом
+ */
 export enum Direction{
     None = 0,
     Forward = 1,

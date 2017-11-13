@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const contracts_1 = require("./contracts");
+/**
+ * Представляет собой робота, против которого ведется игра. Реализован механизм машины состояний
+ */
 class Robot {
     constructor(userButtleShut) {
         this.userButtleShut = userButtleShut;
@@ -68,6 +71,9 @@ class Robot {
     }
 }
 exports.default = Robot;
+/**
+ * Базовый класс состояния для стрельбы
+ */
 class State {
     constructor(buttleShut, _attackCells) {
         this.buttleShut = buttleShut;
@@ -79,6 +85,9 @@ class State {
         });
     }
 }
+/**
+ * Рандомное состояние - стрельбы ведется по случайным ячейкам
+ */
 class RandomState extends State {
     constructor(buttleShut, _attackCells) {
         super(buttleShut, _attackCells);
@@ -98,6 +107,9 @@ class RandomState extends State {
         return this._currentAttackInfo;
     }
 }
+/**
+ * Состояние попадания - включается когда по кораблю было нанесено ранение
+ */
 class GotState extends State {
     constructor(buttleShut, _attackCells, attackInfo) {
         super(buttleShut, _attackCells);

@@ -3,6 +3,9 @@ import Robot from './Robot';
 import { CellStatus } from './contracts';
 import * as $ from 'jquery';
 
+/**
+ * Представляет собой судью
+ */
 export default class Referee{
     private _activePlayer: ActivePlayer;
     private _robot: Robot;
@@ -15,6 +18,9 @@ export default class Referee{
         this._robot = new Robot(userButtle.getDefaultShut());
     }
 
+    /**
+     * Запуск игры
+     */
     play(){
         this.userButtle.lock();
         this.enemyButtle.closeCurtain(true);
@@ -23,6 +29,9 @@ export default class Referee{
         this.activePlayer = ActivePlayer.User;
     }
 
+    /**
+     * Иницилизация обработчика стрельбы по полю робота
+     */
     initUserShut(){
         let self = this;
         let userShut = function(event: any): void{
@@ -35,9 +44,9 @@ export default class Referee{
         this.enemyButtle.shut = userShut;
     }
 
-    initEnemyShut(){
-        let self = this;
-    }
+    // initEnemyShut(){
+    //     let self = this;
+    // }
 
     private get cellStatus(): CellStatus{
         return this._cellStatus;

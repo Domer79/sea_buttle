@@ -1,28 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const $ = require("jquery");
-class Dom {
-    constructor(domElement) {
-        this.childs = new Array();
-        if (!domElement)
-            throw new ArgumentNullException("domElement");
-        if (typeof domElement === "string")
-            this.jqueryElement = $(domElement);
-        else
-            this.jqueryElement = domElement;
-    }
-    render() {
-    }
-    append(dom) {
-        this.childs.push(dom);
-        return this;
-    }
-    text(text) {
-        this.jqueryElement.text(text);
-        return this;
-    }
-}
-exports.default = Dom;
+/**
+ * Возможные состояния ячеек
+ */
 var CellStatus;
 (function (CellStatus) {
     CellStatus[CellStatus["None"] = 0] = "None";
@@ -33,12 +13,18 @@ var CellStatus;
     CellStatus[CellStatus["Got"] = 16] = "Got";
     CellStatus[CellStatus["Dead"] = 32] = "Dead";
 })(CellStatus = exports.CellStatus || (exports.CellStatus = {}));
+/**
+ * ИНформация о об атаке на ячейку
+ */
 class AttackInfo {
     isNone() {
         return this.cellStatus === CellStatus.None;
     }
 }
 exports.AttackInfo = AttackInfo;
+/**
+ * Направление удара - используется роботом
+ */
 var Direction;
 (function (Direction) {
     Direction[Direction["None"] = 0] = "None";
