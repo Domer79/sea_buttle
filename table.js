@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const $ = require("jquery");
+const contracts_1 = require("./contracts");
 class Row {
 }
 Row.ColClasses = ['empty', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
@@ -31,7 +32,10 @@ class ButtleField {
         return $("<thead></thead>").append(row);
     }
     render() {
+        this.jqueryFieldContainer = $("<div class='container'></div>");
+        this.jqueryFieldContainer.append($("<div class='lock'></div>"));
         let jqueryElement = $(`<table class="${this.addClasses()}"></table>`);
+        this.jqueryFieldContainer.append(jqueryElement);
         jqueryElement.append(this.addHeadRow());
         let bodyTable = $("<tbody></tbody>");
         jqueryElement.append(bodyTable);
@@ -53,28 +57,31 @@ class ButtleField {
             bodyTable.append(row);
         }
         this.initShips();
-        $("body").append(jqueryElement);
+        $("body").append(this.jqueryFieldContainer);
     }
     // shut(event: any): any {
     //     let coords = $(this).attr("coords").split(',');
     //     $(this).addClass("got");
     // }
-    defaultShut(row, col) {
-        let fieldCell = this.fieldCells.find(function (element) {
-            return element.row === row && element.col === col;
-        });
-        fieldCell.removeMask();
-        let ship = fieldCell.ship;
-        if (!ship) {
-            fieldCell.cellStatus = CellStatus.Past;
-            return CellStatus.Past;
-        }
-        fieldCell.cellStatus = CellStatus.Dead;
-        if (ship.isDead()) {
-            ship.occupyRemoveMask();
-            return CellStatus.Dead;
-        }
-        return CellStatus.Got;
+    getDefaultShut() {
+        var self = this;
+        return function defaultShut(row, col) {
+            let fieldCell = self.fieldCells.find(function (element) {
+                return element.row === row && element.col === col;
+            });
+            fieldCell.removeMask();
+            let ship = fieldCell.ship;
+            if (!ship) {
+                fieldCell.cellStatus = contracts_1.CellStatus.Past;
+                return contracts_1.CellStatus.Past;
+            }
+            fieldCell.cellStatus = contracts_1.CellStatus.Dead;
+            if (ship.isDead()) {
+                ship.occupyRemoveMask();
+                return contracts_1.CellStatus.Dead;
+            }
+            return contracts_1.CellStatus.Got;
+        };
     }
     addClasses() {
         return "field";
@@ -96,11 +103,11 @@ class ButtleField {
         let index = 0;
         while (true) {
             if (!ship || !ship.coords[index]) {
-                console.log(ship);
-                console.log(ship.coords[index]);
+                // console.log(ship);
+                // console.log(ship.coords[index]);
             }
             ship.coords[index] = fieldCell;
-            ship.coords[index].cellStatus = CellStatus.Live;
+            ship.coords[index].cellStatus = contracts_1.CellStatus.Live;
             if (ship.ready)
                 break;
             fieldCell = fieldCell.getNextCell();
@@ -115,8 +122,8 @@ class ButtleField {
         }
         ship.occupy();
         this.fieldCells.forEach(element => {
-            if (element.cellStatus === CellStatus.Temp) {
-                element.cellStatus = CellStatus.None;
+            if (element.cellStatus === contracts_1.CellStatus.Temp) {
+                element.cellStatus = contracts_1.CellStatus.None;
             }
         });
     }
@@ -127,13 +134,37 @@ class ButtleField {
     }
     getFreeCells() {
         return this.fieldCells.filter(function (fieldCell) {
-            return fieldCell.cellStatus === CellStatus.None;
+            return fieldCell.cellStatus === contracts_1.CellStatus.None;
         });
     }
-    closeCurtain() {
+    closeCurtain(withShips) {
         this.fieldCells.forEach(element => {
-            element.addMask();
+            if (withShips) {
+                element.addMask();
+                return;
+            }
+            if (!element.ship)
+                element.addMask();
         });
+    }
+    lock() {
+        let lock = $(".lock", this.jqueryFieldContainer);
+        lock.css("display", "inline");
+    }
+    unLock() {
+        let lock = $(".lock", this.jqueryFieldContainer);
+        lock.css("display", "none");
+    }
+    down() {
+        return this.ships.filter(function (element) {
+            return element.isDead();
+        }).length == this.ships.length;
+    }
+    fog() {
+        $(this.jqueryFieldContainer).css("opacity", "0.5");
+    }
+    clearFog() {
+        $(this.jqueryFieldContainer).css("opacity", "");
     }
 }
 exports.default = ButtleField;
@@ -143,7 +174,7 @@ class FieldCell {
         this.td = td;
         this._row = r;
         this._col = c;
-        this.cellStatus = CellStatus.None;
+        this.cellStatus = contracts_1.CellStatus.None;
     }
     get row() {
         return this._row;
@@ -157,8 +188,8 @@ class FieldCell {
     set cellStatus(value) {
         this._cellStatus = value;
         this.td
-            .removeClass(Services.EnumToArray(CellStatus).join(' ').toLowerCase())
-            .addClass(CellStatus[value].toLowerCase());
+            .removeClass(Services.EnumToArray(contracts_1.CellStatus).join(' ').toLowerCase())
+            .addClass(contracts_1.CellStatus[value].toLowerCase());
     }
     getNextCell() {
         var self = this;
@@ -167,7 +198,7 @@ class FieldCell {
         });
         if (!nextCell)
             return nextCell;
-        if (nextCell.cellStatus !== CellStatus.None)
+        if (nextCell.cellStatus !== contracts_1.CellStatus.None)
             return undefined;
         return nextCell;
     }
@@ -175,8 +206,8 @@ class FieldCell {
         this.ship = ship;
         this.workAround((fieldCells) => {
             fieldCells.forEach(element => {
-                if (element && (element.cellStatus === CellStatus.None || element.cellStatus === CellStatus.Temp))
-                    element.cellStatus = CellStatus.Occupy;
+                if (element && (element.cellStatus === contracts_1.CellStatus.None || element.cellStatus === contracts_1.CellStatus.Temp))
+                    element.cellStatus = contracts_1.CellStatus.Occupy;
             });
         });
     }
@@ -186,7 +217,7 @@ class FieldCell {
         });
     }
     isDead() {
-        return this.cellStatus === CellStatus.Dead;
+        return this.cellStatus === contracts_1.CellStatus.Dead;
     }
     addMask() {
         this.td.addClass("mask");
@@ -194,10 +225,13 @@ class FieldCell {
     removeMask() {
         this.td.removeClass("mask");
     }
+    isMask() {
+        return this.td.hasClass("mask");
+    }
     occupyRemoveMask() {
         this.workAround((fieldCells) => {
             fieldCells.forEach(element => {
-                if (element && (element.cellStatus === CellStatus.Occupy || element.cellStatus === CellStatus.Past))
+                if (element && (element.cellStatus === contracts_1.CellStatus.Occupy || element.cellStatus === contracts_1.CellStatus.Past))
                     element.td.removeClass("mask");
             });
         });
@@ -223,16 +257,7 @@ class FieldCell {
         ]);
     }
 }
-var CellStatus;
-(function (CellStatus) {
-    CellStatus[CellStatus["None"] = 0] = "None";
-    CellStatus[CellStatus["Temp"] = 1] = "Temp";
-    CellStatus[CellStatus["Occupy"] = 2] = "Occupy";
-    CellStatus[CellStatus["Past"] = 4] = "Past";
-    CellStatus[CellStatus["Live"] = 8] = "Live";
-    CellStatus[CellStatus["Got"] = 16] = "Got";
-    CellStatus[CellStatus["Dead"] = 32] = "Dead";
-})(CellStatus = exports.CellStatus || (exports.CellStatus = {}));
+exports.FieldCell = FieldCell;
 class Ship {
     constructor(length) {
         this.length = length;
@@ -243,13 +268,13 @@ class Ship {
     }
     clear() {
         this.coords.forEach(element => {
-            element.cellStatus = CellStatus.None;
+            element.cellStatus = contracts_1.CellStatus.None;
         });
     }
     SetTemp() {
         this.coords.forEach(element => {
             if (element)
-                element.cellStatus = CellStatus.Temp;
+                element.cellStatus = contracts_1.CellStatus.Temp;
         });
     }
     get ready() {
@@ -257,7 +282,7 @@ class Ship {
     }
     isReady() {
         var result = !this.coords.some(function (element) {
-            return !element || (element.cellStatus !== CellStatus.Live);
+            return !element || (element.cellStatus !== contracts_1.CellStatus.Live);
         });
         return result;
     }

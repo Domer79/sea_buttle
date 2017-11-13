@@ -1,5 +1,6 @@
 import * as $ from "jquery";
 import * as jQuery from "jquery";
+import {CellStatus} from './contracts';
 
 class Row {
     static ColClasses: string[] = ['empty', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']
@@ -22,6 +23,7 @@ export default class ButtleField{
 
     ships: Ship[] = new Array<Ship>();
     fieldCells: FieldCell[] = new Array<FieldCell>();
+    jqueryFieldContainer: any;
 
     addHeadRow(): any {
         let row = $(`<tr class="headRow"></tr>`);
@@ -38,7 +40,10 @@ export default class ButtleField{
     }
 
     render() {
+        this.jqueryFieldContainer = $("<div class='container'></div>");
+        this.jqueryFieldContainer.append($("<div class='lock'></div>"));
         let jqueryElement = $(`<table class="${this.addClasses()}"></table>`);
+        this.jqueryFieldContainer.append(jqueryElement);
         jqueryElement.append(this.addHeadRow());
         let bodyTable = $("<tbody></tbody>");
         jqueryElement.append(bodyTable);
@@ -67,7 +72,7 @@ export default class ButtleField{
  
         this.initShips();
         
-        $("body").append(jqueryElement);
+        $("body").append(this.jqueryFieldContainer);
     }
 
     // shut(event: any): any {
@@ -75,26 +80,29 @@ export default class ButtleField{
     //     $(this).addClass("got");
     // }
 
-    defaultShut(row: number, col: number): CellStatus{
-        let fieldCell = this.fieldCells.find(function(element: FieldCell){
-            return element.row === row && element.col === col;
-        });
-
-        fieldCell.removeMask();
-
-        let ship = fieldCell.ship;
-        if (!ship){
-            fieldCell.cellStatus = CellStatus.Past;
-            return CellStatus.Past;
+    getDefaultShut(): (row: Number, col: Number) => CellStatus{
+        var self = this;
+        return function defaultShut(row: number, col: number): CellStatus{
+            let fieldCell = self.fieldCells.find(function(element: FieldCell){
+                return element.row === row && element.col === col;
+            });
+    
+            fieldCell.removeMask();
+    
+            let ship = fieldCell.ship;
+            if (!ship){
+                fieldCell.cellStatus = CellStatus.Past;
+                return CellStatus.Past;
+            }
+    
+            fieldCell.cellStatus = CellStatus.Dead;
+            if (ship.isDead()){
+                ship.occupyRemoveMask();
+                return CellStatus.Dead;
+            }
+    
+            return CellStatus.Got;
         }
-
-        fieldCell.cellStatus = CellStatus.Dead;
-        if (ship.isDead()){
-            ship.occupyRemoveMask();
-            return CellStatus.Dead;
-        }
-
-        return CellStatus.Got;
     }
 
     shut: (event: any) => void;
@@ -124,8 +132,8 @@ export default class ButtleField{
 
         while(true){
             if (!ship || !ship.coords[index]){
-                console.log(ship);
-                console.log(ship.coords[index]);
+                // console.log(ship);
+                // console.log(ship.coords[index]);
             }
 
             ship.coords[index] = fieldCell as FieldCell;
@@ -163,18 +171,49 @@ export default class ButtleField{
 
     private getFreeCells(): Array<FieldCell>{
         return this.fieldCells.filter(function(fieldCell: FieldCell){
+
             return fieldCell.cellStatus === CellStatus.None;
         });
     }
 
-    closeCurtain(): void {
+    closeCurtain(withShips?: boolean): void {
         this.fieldCells.forEach(element => {
-            element.addMask();
+            if (withShips){
+                element.addMask();
+                return;
+            }
+            
+            if (!element.ship)
+                element.addMask();
         });
+    }
+
+    lock(): any {
+        let lock = $(".lock", this.jqueryFieldContainer);
+        lock.css("display", "inline")
+    }
+
+    unLock(): any {
+        let lock = $(".lock", this.jqueryFieldContainer);
+        lock.css("display", "none")
+    }
+
+    down(): boolean{
+        return this.ships.filter(function(element: Ship){
+            return element.isDead();
+        }).length == this.ships.length;
+    }
+
+    fog(){
+        $(this.jqueryFieldContainer).css("opacity", "0.5");
+    }
+
+    clearFog(){
+        $(this.jqueryFieldContainer).css("opacity", "");    
     }
 }
 
-class FieldCell{
+export class FieldCell{
     ship: Ship;
     private _row: number;
     private _col: number;
@@ -232,7 +271,7 @@ class FieldCell{
         });
     }
 
-    getCell(r,c:number){
+    private getCell(r: number, c:number): FieldCell{
         return this.allCells.find(function(element:FieldCell){
             return element.row === r && element.col === c;
         });
@@ -248,6 +287,10 @@ class FieldCell{
 
     removeMask() {
         this.td.removeClass("mask");
+    }
+
+    private isMask(): boolean{
+        return this.td.hasClass("mask");
     }
 
     occupyRemoveMask(){
@@ -283,16 +326,6 @@ class FieldCell{
                 bottomCell
             ]);
     }
-}
-
-export enum CellStatus{
-    None = 0, //Автоматически устанавливается при инициализация
-    Temp = 1, //Временный статус, используется при инициализации корабля
-    Occupy = 2, //Устанавливается для ячеек вокруг корабля, при его инициализации
-    Past = 4, //Устанавливается при непопадании по кораблю
-    Live = 8, //Устанавливается при инициализации корабля
-    Got = 16, //Устанавливается при попадании в корабль
-    Dead = 32, //Устанавливается при полном уничтожении корабля
 }
 
 class Ship{

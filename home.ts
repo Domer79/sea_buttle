@@ -2,6 +2,7 @@ import f1 from './mydefault';
 import ButtleField from './table'; 
 import Robot from './Robot';
 import Referee from './referee';
+import { CellStatus } from './contracts';
 
 export module home{
     f1();
@@ -15,6 +16,6 @@ export module home{
 
     referee.play();
     
-    console.log(t1.ships);
-    console.log(t2.ships);
+    // console.log(t1.ships);
+    // console.log(t2.ships);
 }

@@ -12,6 +12,6 @@ var home;
     t1.render();
     t2.render();
     referee.play();
-    console.log(t1.ships);
-    console.log(t2.ships);
+    // console.log(t1.ships);
+    // console.log(t2.ships);
 })(home = exports.home || (exports.home = {}));
