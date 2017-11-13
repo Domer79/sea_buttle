@@ -75,7 +75,7 @@ export default class Referee{
             clearInterval(this._timeoutId);
             this.userButtle.lock();
             this.enemyButtle.lock();
-            this.displayWinBanner(`${ActivePlayer[this._activePlayer]} Win!!!`);
+            this.displayWinBanner(`${ActivePlayer[this._activePlayer]} Win!!! To retry, press F5.`);
             console.log(`${ActivePlayer[this._activePlayer]} Win!!!`);
         }
     }
