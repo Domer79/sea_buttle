@@ -154,7 +154,6 @@ class GotState extends State{
     }
 
     private getDirection(): Direction{
-        debugger;
         if (this._attackInfo.direction === Direction.None){
             let randomBool = Math.round(Math.random());
             this._attackInfo.direction = Boolean(randomBool) ? Direction.Forward : Direction.Backward;

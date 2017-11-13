@@ -61,6 +61,7 @@ export default class ButtleField{
                     let coords = $(this).attr("coords").split(',');
                     $(this).trigger({type: "shut", "coords": coords});
                 });
+                $td.append("<div class='fire'></div>");
                 row.append($td);
 
                 let fieldCell = new FieldCell(r+1, c, this.fieldCells, $td);
@@ -86,9 +87,11 @@ export default class ButtleField{
             let fieldCell = self.fieldCells.find(function(element: FieldCell){
                 return element.row === row && element.col === col;
             });
-    
+
             fieldCell.removeMask();
-    
+            fieldCell.fire();
+            fieldCell.disable()
+            
             let ship = fieldCell.ship;
             if (!ship){
                 fieldCell.cellStatus = CellStatus.Past;
@@ -289,17 +292,30 @@ export class FieldCell{
         this.td.removeClass("mask");
     }
 
-    private isMask(): boolean{
-        return this.td.hasClass("mask");
-    }
-
     occupyRemoveMask(){
         this.workAround((fieldCells: Array<FieldCell>) => {
             fieldCells.forEach(element => {
-                if (element && (element.cellStatus === CellStatus.Occupy || element.cellStatus === CellStatus.Past))
+                if (element && (element.cellStatus === CellStatus.Occupy || element.cellStatus === CellStatus.Past)){
                     element.td.removeClass("mask");
+                    element.disable();
+                }
             });
         });
+    }
+
+    fire(){
+        $(".fire", this.td).show("fast", function(){
+            $(this).hide();
+        });
+    }
+
+    disable(){
+        this.td.unbind("shut");
+        this.td.css("cursor", "default");
+    }
+
+    private isMask(): boolean{
+        return this.td.hasClass("mask");
     }
 
     private workAround(work: (cells: Array<FieldCell>) => void){

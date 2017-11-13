@@ -121,7 +121,6 @@ class GotState extends State {
         return this._attackInfo;
     }
     getDirection() {
-        debugger;
         if (this._attackInfo.direction === contracts_1.Direction.None) {
             let randomBool = Math.round(Math.random());
             this._attackInfo.direction = Boolean(randomBool) ? contracts_1.Direction.Forward : contracts_1.Direction.Backward;

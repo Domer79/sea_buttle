@@ -6,6 +6,7 @@ $imageFolderPath: '/images';
 }
 
 table {
+  border-collapse: collapse;
   thead{
     tr{
       th{
@@ -18,6 +19,13 @@ table {
       td{
         @extend %base-cell;
         cursor: pointer;
+        border: 1px solid blue;
+        .fire{
+          width: 100%;
+          height: 100%;
+          background-image: url($imageFolderPath+'/fire.png');
+          display: none;
+        }
       }
       .none{
         background-color: antiquewhite;

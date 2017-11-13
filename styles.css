@@ -2,30 +2,31 @@ table thead tr th, table tbody tr td {
   width: 20px;
   height: 20px; }
 
-table tbody tr td {
-  cursor: pointer; }
-
-table tbody tr .none {
-  background-color: antiquewhite; }
-
-table tbody tr .occupy {
-  background-image: url("/images/occupy.png"); }
-
-table tbody tr .past {
-  background-image: url("/images/past.png");
-  cursor: default; }
-
-table tbody tr .live {
-  background-image: url("/images/live.png"); }
-
-table tbody tr .got {
-  background-image: url("/images/got.png"); }
-
-table tbody tr .dead {
-  background-image: url("/images/dead.png"); }
-
-table tbody tr .mask {
-  background-image: url("/images/mask.png"); }
+table {
+  border-collapse: collapse; }
+  table tbody tr td {
+    cursor: pointer;
+    border: 1px solid blue; }
+    table tbody tr td .fire {
+      width: 100%;
+      height: 100%;
+      background-image: url("/images/fire.png");
+      display: none; }
+  table tbody tr .none {
+    background-color: antiquewhite; }
+  table tbody tr .occupy {
+    background-image: url("/images/occupy.png"); }
+  table tbody tr .past {
+    background-image: url("/images/past.png");
+    cursor: default; }
+  table tbody tr .live {
+    background-image: url("/images/live.png"); }
+  table tbody tr .got {
+    background-image: url("/images/got.png"); }
+  table tbody tr .dead {
+    background-image: url("/images/dead.png"); }
+  table tbody tr .mask {
+    background-image: url("/images/mask.png"); }
 
 .container {
   position: relative;
